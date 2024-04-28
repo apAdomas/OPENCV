@@ -1,5 +1,6 @@
 import cv2 as cv
 import sys
+from rescale_utils import rescale_frames, change_res
 
 
 def process_image():
@@ -9,42 +10,18 @@ def process_image():
     if img is None:
         print("Error: Image not found")
     else:
-        # get curr dim of the img
-        height, width = img.shape[:2]
-
-        # determine scaling factor
-        max_dim = 700
-        scale = min(max_dim/height, max_dim/width)
-
-        # compute dim and resize img
-        new_width = int(width * scale)
-        new_height = int(height * scale)
-        resized_img = cv.resize(img, (new_width, new_height))
-
-        # display image after read
+        # call resize func and display
+        resized_img = rescale_frames(img)
         cv.imshow('Resized Cat', resized_img)
 
         # wait for key to be pressed before closing
         cv.waitKey(0)
-
         cv.destroyAllWindows()
+
 
 def process_video():
     # pass 0 as param to use camera, or file path
     capture = cv.VideoCapture('Videos/Dog.mp4')
-
-    isTrue, frame = capture.read()
-    if not isTrue:
-        print("Error: Cannot read video")
-        capture.release()
-        return
-
-    # Get dimensions for first frame
-    height, width = frame.shape[:2]
-    max_dim = 700
-    scale = min(max_dim/height, max_dim/width)
-    new_width = int(width * scale)
-    new_height = int(height * scale)
 
     # Process
     while True:
@@ -52,11 +29,35 @@ def process_video():
         if not isTrue:
             break # break if no frame read or error
 
-        resized_frame = cv.resize(frame, (new_width, new_height))
+        # call resize func to resize frame
+        resized_frame = rescale_frames(frame)
+
         # display frame
         cv.imshow('Video', resized_frame)
 
         # stop video
+        if cv.waitKey(20) & 0xFF == ord('d'):
+            break
+
+    capture.release()
+    cv.destroyAllWindows()
+
+
+def process_live_video():
+    capture = cv.VideoCapture(0)
+
+    width = 640
+    height = 480
+
+    change_res(capture, width, height)
+
+    while True:
+        isTrue, frame = capture.read()
+        if not istTrue:
+            break
+
+        resized_frame = rescale_frames(frame)
+        cv.imshow('Live Video', frame)
         if cv.waitKey(20) & 0xFF == ord('d'):
             break
 
@@ -69,6 +70,8 @@ if __name__ == '__main__':
             process_image()
         elif sys.argv[1] == 'video':
             process_video()
+        elif sys.argv[1] == 'live':
+            process_live_video()
         else:
             print("Invalid argument. Use 'image' or 'video'.")
     else:

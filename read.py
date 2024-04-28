@@ -53,11 +53,13 @@ def process_live_video():
 
     while True:
         isTrue, frame = capture.read()
-        if not istTrue:
+        if not isTrue:
             break
 
         resized_frame = rescale_frames(frame)
-        cv.imshow('Live Video', frame)
+        cv.imshow('Live Video', resized_frame)
+
+        # stop when d is pressed
         if cv.waitKey(20) & 0xFF == ord('d'):
             break
 
@@ -73,6 +75,6 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'live':
             process_live_video()
         else:
-            print("Invalid argument. Use 'image' or 'video'.")
+            print("Invalid argument. Use 'image', 'video', or 'live'.")
     else:
-        print("No valid argument provided. Use 'image' or 'video'.")
+        print("No valid argument provided. Use 'image', 'video', or 'live'.")
